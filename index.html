@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111">
+<title>Photo Challenge</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f5;color:#111}
+.app{max-width:760px;margin:auto;min-height:100vh;background:#f5f5f5}
+header{padding:28px 20px 12px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:850;font-size:24px;letter-spacing:-1px}.pill{background:#111;color:#fff;border-radius:99px;padding:9px 13px;font-weight:700}
+main{padding:12px 20px 90px}.eyebrow{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#777}
+h1{font-size:38px;line-height:1.02;margin:6px 0 18px;letter-spacing:-1.8px}
+.card{background:#fff;border-radius:24px;padding:20px;margin:14px 0;box-shadow:0 4px 20px #0000000d}
+.challenge{background:#111;color:#fff;min-height:270px;display:flex;flex-direction:column;justify-content:space-between}
+.tag{display:inline-block;border:1px solid #ffffff44;border-radius:99px;padding:7px 10px;font-size:12px;font-weight:800}
+.challenge h2{font-size:30px;margin:18px 0 8px;letter-spacing:-1px}.challenge p{color:#bbb;line-height:1.45}
+.btn{border:0;border-radius:15px;padding:14px 17px;font-size:16px;font-weight:800;cursor:pointer}
+.primary{background:#fff;color:#111}.dark{background:#111;color:#fff}.wide{width:100%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{background:#fff;border-radius:20px;padding:17px}.stat b{font-size:26px;display:block}.stat small{color:#777}
+.progress{height:10px;background:#ddd;border-radius:99px;overflow:hidden;margin-top:10px}.bar{height:100%;background:#111;width:0}
+nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffee;backdrop-filter:blur(12px);border-top:1px solid #ddd;display:flex;justify-content:center;gap:8px;padding:10px;z-index:5}
+nav button{background:none;border:0;padding:10px 18px;border-radius:13px;font-weight:750;color:#777}nav button.active{background:#111;color:#fff}
+.screen{display:none}.screen.active{display:block}
+.photo-preview{width:100%;max-height:420px;object-fit:cover;border-radius:18px;margin-top:12px;display:none}
+textarea{width:100%;min-height:120px;border:1px solid #ddd;border-radius:15px;padding:14px;font:inherit;resize:vertical}
+input[type=file]{display:none}.upload{display:block;text-align:center;border:2px dashed #bbb;border-radius:18px;padding:24px;font-weight:750;cursor:pointer}
+.history-item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #eee}.thumb{width:65px;height:65px;border-radius:12px;object-fit:cover;background:#ddd}.muted{color:#777}.success{padding:13px;border-radius:14px;background:#e8f5e9;margin-top:12px}
+@media(min-width:700px){main{padding-left:0;padding-right:0}.app{background:#f5f5f5}nav{position:static;border:0;background:transparent}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">PHOTO CHALLENGE</div><div class="pill">🔥 <span id="streakTop">0</span></div></header>
+
+<main>
+<section id="home" class="screen active">
+<div class="eyebrow">Heute · <span id="date"></span></div>
+<h1>Mach ein Foto.<br>Lern etwas dabei.</h1>
+<div class="card challenge">
+  <div><span class="tag" id="difficulty">EASY</span><h2 id="challengeTitle">Führende Linien</h2><p id="challengeText"></p></div>
+  <button class="btn primary" onclick="show('challenge')">Challenge starten →</button>
+</div>
+<div class="grid">
+<div class="stat"><small>🔥 Streak</small><b id="streak">0 Tage</b></div>
+<div class="stat"><small>📸 Fotos</small><b id="photoCount">0</b></div>
+</div>
+<div class="card"><b>Dein Fortschritt</b><div class="progress"><div class="bar" id="progress"></div></div><p class="muted" id="progressText">0 von 30 Challenges</p></div>
+</section>
+
+<section id="challenge" class="screen">
+<div class="eyebrow">Challenge des Tages</div>
+<h1 id="challengeTitle2">Führende Linien</h1>
+<div class="card"><b id="category">Komposition</b><p id="challengeLong"></p><p class="muted">Tipp: Achte darauf, wohin die Linien im Bild den Blick führen.</p></div>
+<div class="card">
+<label class="upload" for="photo">📷 Foto aufnehmen / aus Galerie wählen</label>
+<input id="photo" type="file" accept="image/*" capture="environment">
+<img id="preview" class="photo-preview">
+</div>
+<div class="card">
+<b>Was wolltest du mit dem Bild zeigen?</b>
+<p class="muted">Beschreibe kurz deine Idee. Das ist wichtiger als eine Punktzahl.</p>
+<textarea id="intent" placeholder="Ich wollte zeigen, dass ..."></textarea>
+<button class="btn dark wide" style="margin-top:12px" onclick="submitChallenge()">Challenge abschließen</button>
+<div id="message"></div>
+</div>
+</section>
+
+<section id="progressScreen" class="screen">
+<div class="eyebrow">Deine Entwicklung</div><h1>Fortschritt</h1>
+<div class="grid">
+<div class="stat"><small>Komposition</small><b id="c1">0%</b></div>
+<div class="stat"><small>Licht</small><b id="c2">0%</b></div>
+<div class="stat"><small>Perspektive</small><b id="c3">0%</b></div>
+<div class="stat"><small>Kreativität</small><b id="c4">0%</b></div>
+</div>
+<div class="card"><b>30-Tage-Ziel</b><p class="muted">Trainiere jeden Tag eine andere fotografische Fähigkeit.</p><div class="progress"><div class="bar" id="goal"></div></div></div>
+</section>
+
+<section id="history" class="screen">
+<div class="eyebrow">Archiv</div><h1>Deine Fotos</h1>
+<div id="historyList" class="card"><p class="muted">Noch keine Challenge abgeschlossen.</p></div>
+</section>
+</main>
+
+<nav>
+<button class="active" data-s="home" onclick="show('home')">⌂ Start</button>
+<button data-s="challenge" onclick="show('challenge')">📸 Challenge</button>
+<button data-s="progressScreen" onclick="show('progressScreen')">◔ Fortschritt</button>
+<button data-s="history" onclick="show('history')">▣ Archiv</button>
+</nav>
+</div>
+
+<script>
+const challenges=[
+{title:"Führende Linien",cat:"Komposition",diff:"EASY",text:"Finde ein Motiv, bei dem eine Linie den Blick bewusst zum Hauptmotiv führt.",long:"Nutze Straßen, Geländer, Schatten, Wege, Zäune oder Gebäudekanten als visuelle Linien. Die Linie soll nicht nur im Bild sein – sie soll eine Aufgabe haben."},
+{title:"Gegenlicht",cat:"Licht",diff:"EASY",text:"Fotografiere ein Motiv bewusst gegen eine Lichtquelle.",long:"Beobachte, wie sich Silhouetten, Konturen und Kontraste verändern. Entscheide selbst, ob du Details behalten oder bewusst reduzieren willst."},
+{title:"Tief runter",cat:"Perspektive",diff:"EASY",text:"Fotografiere dein Motiv aus einer ungewöhnlich niedrigen Perspektive.",long:"Geh näher an den Boden und fotografiere nach oben. Achte darauf, wie sich Größenverhältnisse und Vordergrund verändern."},
+{title:"Drei Ebenen",cat:"Landschaft",diff:"MEDIUM",text:"Baue Vordergrund, Mittelgrund und Hintergrund in ein Bild ein.",long:"Suche ein Motiv, bei dem mindestens drei räumliche Ebenen klar erkennbar sind. Versuche, dadurch Tiefe zu erzeugen."},
+{title:"Bewegung",cat:"Technik",diff:"MEDIUM",text:"Mach Bewegung im Bild sichtbar.",long:"Fotografiere etwas Bewegtes. Überlege vor dem Auslösen, ob du die Bewegung einfrieren oder durch Unschärfe zeigen möchtest."},
+{title:"Alltag anders",cat:"Kreativität",diff:"MEDIUM",text:"Fotografiere einen gewöhnlichen Gegenstand so, dass er ungewöhnlich wirkt.",long:"Verändere Perspektive, Licht, Ausschnitt oder Umgebung. Das Motiv selbst darf völlig langweilig sein."},
+{title:"Eine Geschichte",cat:"Storytelling",diff:"HARD",text:"Erzähle mit nur einem Foto eine kleine Geschichte.",long:"Dein Bild sollte beim Betrachter eine Frage auslösen oder einen Moment vermitteln. Überlege, welche Informationen du zeigen und welche du weglassen willst."}
+];
+
+let data=JSON.parse(localStorage.getItem('photoChallenge')||'{"done":[],"last":null,"streak":0}');
+const todayKey=new Date().toISOString().slice(0,10);
+let index=Math.floor((new Date().getFullYear()+new Date().getMonth()+new Date().getDate())%challenges.length);
+let ch=challenges[index];
+
+function render(){
+document.getElementById('date').textContent=new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+['challengeTitle','challengeTitle2'].forEach(id=>document.getElementById(id).textContent=ch.title);
+document.getElementById('category').textContent=ch.cat;
+document.getElementById('difficulty').textContent=ch.diff;
+document.getElementById('challengeText').textContent=ch.text;
+document.getElementById('challengeLong').textContent=ch.long;
+document.getElementById('streak').textContent=data.streak+' Tage';
+document.getElementById('streakTop').textContent=data.streak;
+document.getElementById('photoCount').textContent=data.done.length;
+let pct=Math.min(100,data.done.length/30*100);document.getElementById('progress').style.width=pct+'%';document.getElementById('goal').style.width=pct+'%';
+document.getElementById('progressText').textContent=data.done.length+' von 30 Challenges';
+['c1','c2','c3','c4'].forEach((id,i)=>{let cats=['Komposition','Licht','Perspektive','Kreativität'];let n=data.done.filter(x=>x.cat===cats[i]).length;document.getElementById(id).textContent=Math.min(100,n*25)+'%'});
+renderHistory();
+}
+function show(id){
+document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');
+document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.s===id));
+window.scrollTo(0,0);
+}
+document.getElementById('photo').addEventListener('change',e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{document.getElementById('preview').src=r.result;document.getElementById('preview').style.display='block';};r.readAsDataURL(f)});
+function submitChallenge(){
+let f=document.getElementById('photo').files[0], intent=document.getElementById('intent').value.trim();
+if(!f){alert('Wähle zuerst ein Foto aus.');return} if(!intent){alert('Schreib kurz dazu, was du mit dem Bild zeigen wolltest.');return}
+let reader=new FileReader();reader.onload=()=>{data.done.push({date:todayKey,title:ch.title,cat:ch.cat,intent,src:reader.result});if(data.last!==todayKey){data.streak=(data.last===new Date(Date.now()-86400000).toISOString().slice(0,10))?data.streak+1:1;data.last=todayKey}localStorage.setItem('photoChallenge',JSON.stringify(data));document.getElementById('message').innerHTML='<div class="success">✓ Challenge abgeschlossen! Stark. Morgen wartet die nächste Aufgabe.</div>';render();setTimeout(()=>show('home'),900)};reader.readAsDataURL(f);
+}
+function renderHistory(){let el=document.getElementById('historyList');if(!data.done.length){el.innerHTML='<p class="muted">Noch keine Challenge abgeschlossen.</p>';return}el.innerHTML=data.done.slice().reverse().map(x=>`<div class="history-item"><img class="thumb" src="${x.src}"><div><b>${x.title}</b><br><small>${x.date} · ${x.cat}</small><br><small class="muted">„${x.intent.replaceAll('<','&lt;')}“</small></div></div>`).join('')}
+render();
+</script>
+</body>
+</html>
